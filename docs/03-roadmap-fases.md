@@ -8,6 +8,7 @@
 
 ## Fase 1 — Mecanica de piernas (2-4 semanas)
 - Definir DOF final por pierna (ver [mecanica/diseno-estructural.md](../mecanica/diseno-estructural.md)).
+- Diseñar y validar el modelo 3D completo antes de imprimir (ver [mecanica/plan-diseno-3d.md](../mecanica/plan-diseno-3d.md)).
 - Modelar/imprimir o cortar piezas de piernas + torso.
 - Montar 12 servos + estructura, sin electronica final aun (solo prueba mecanica de rango de movimiento a mano).
 - Salida: estructura bipeda armada, se puede mover manualmente cada articulacion.
