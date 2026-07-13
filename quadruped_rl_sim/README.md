@@ -50,6 +50,7 @@ Alternativa sin compilar: instalar Miniconda y `conda install -c conda-forge pyb
 | `train.py` | Entrena PPO con `stable_baselines3`, entornos en paralelo (`SubprocVecEnv`), checkpoints periodicos, logging a `logs/` (tensorboard). |
 | `enjoy.py` | Carga un `.zip` de SB3 y corre la politica en GUI, en tiempo real. |
 | `requirements.txt` | Versiones pineadas, probadas juntas. |
+| `colab_train.ipynb` | Entrena en Google Colab (gratis) en vez de tu laptop. Auto-resume, checkpoints persistidos en Drive, video del gait sin GUI. Ver seccion "Entrenar en la nube" abajo. |
 
 ## Uso
 
@@ -77,6 +78,26 @@ Ver progreso en tensorboard:
 ```bash
 tensorboard --logdir logs
 ```
+
+## Entrenar en la nube (sin depender de la laptop)
+
+Abrí `colab_train.ipynb` en [Google Colab](https://colab.research.google.com) (`Archivo >
+Subir notebook`, o directo desde GitHub apuntando a este repo). Corre el mismo `train.py`
+pero en los servidores de Colab: monta tu Google Drive, clona el repo ahí (así los
+checkpoints sobreviven a que Colab te desconecte solo, cosa que hace cada rato), instala
+`requirements.txt` (en Linux `pybullet` sí tiene wheel, no hace falta compilar como en
+Windows), y entrena en tandas con auto-resume -- cada vez que volvés a correr la celda de
+entrenamiento, sea el mismo día o diez días después, sigue desde el último checkpoint
+guardado en Drive, no arranca de cero.
+
+**Importante**: esto es CPU-bound (la física de PyBullet, no la red), la GPU gratis de
+Colab no acelera nada acá -- dejá el runtime en CPU. Lo que sí importa es la cantidad de
+vCPUs (gratis suele ser 2, similar o menos que una laptop, así que la ventaja no es
+velocidad sino no tener que dejar la laptop prendida).
+
+Como Colab no tiene pantalla, `enjoy.py` (que abre GUI) no sirve ahí -- el notebook
+incluye una celda que graba la política en un `.mp4` en modo headless para verla inline
+o bajarla de Drive.
 
 Ver la politica entrenada:
 ```bash
