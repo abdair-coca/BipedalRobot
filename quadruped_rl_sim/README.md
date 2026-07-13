@@ -63,6 +63,16 @@ Entrenar:
 python train.py --n-envs 8 --timesteps 2000000
 ```
 
+Continuar un entrenamiento que se corto (Ctrl+C, cierre de terminal, corte de luz):
+```bash
+python train.py --resume checkpoints\ppo_quadruped_400000_steps.zip --timesteps 1600000
+```
+`--timesteps` acá es la cantidad ADICIONAL a correr desde donde quedo (no el total
+absoluto), el contador de steps sigue sumando desde el checkpoint. Tensorboard va a
+abrir una subcarpeta de log nueva para este tramo (mismo `--run-name` => se numera
+sola, ej. `ppo_quadruped_2`) en vez de continuar literalmente la misma curva, pero el
+eje de timesteps es continuo entre tramos.
+
 Ver progreso en tensorboard:
 ```bash
 tensorboard --logdir logs
