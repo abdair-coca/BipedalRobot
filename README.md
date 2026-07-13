@@ -14,6 +14,7 @@ Reutiliza y extiende el hardware/software ya desarrollado en robotCreeper (cabez
 | [`software/`](software/) | Control de marcha, cinematica, simulacion (a definir) |
 | [`gestion/`](gestion/) | Backlog y milestones del proyecto |
 | [`tests/`](tests/) | Tests de componentes especificos, aislados del firmware final |
+| [`quadruped_rl_sim/`](quadruped_rl_sim/) | Experimento aislado: sim PyBullet+RL (PPO) de marcha en un cuadrupedo 12 DOF, previo a portar el enfoque al bipedo real |
 
 ## Punto de partida
 
