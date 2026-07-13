@@ -20,37 +20,48 @@ import math
 # ---------------------------------------------------------------------------
 # TORSO
 # ---------------------------------------------------------------------------
-# Caja rectangular. Ajusta a las medidas reales del chasis cuando las tengas.
-BODY_LENGTH = 0.30   # [m] eje X, largo del torso (~25-30 cm target)
-BODY_WIDTH = 0.15    # [m] eje Y, ancho del torso
-BODY_HEIGHT = 0.08   # [m] eje Z, alto del torso
-BODY_MASS = 1.5       # [kg] masa aproximada del torso con electronica/bateria
+# Caja rectangular. Medidas reales del chasis "spider-open-v1" (SketchUp,
+# 2026-07-13), bounding box del cuerpo.
+BODY_LENGTH = 0.14595   # [m] eje X, 145.95mm medido
+BODY_WIDTH = 0.11419    # [m] eje Y, 114.19mm medido
+BODY_HEIGHT = 0.040     # [m] eje Z, 40mm medido
+# MASAS: TODO -- no hay peso real todavia (pesar el chasis/patas impresos +
+# servos + bateria en balanza). Valores placeholder chicos, coherentes con
+# un chasis de este tamano en impresion 3D + servos tipo SG90/MG90S, pero
+# NO son una medicion real. Reemplazar apenas se pese el robot.
+BODY_MASS = 0.25       # [kg] PLACEHOLDER
 
 # ---------------------------------------------------------------------------
 # GEOMETRIA DE PATA (misma para las 4 patas; cambia solo el signo del
 # offset de montaje en el torso)
 # ---------------------------------------------------------------------------
 # Link "hip": stub corto que separa el eje de abduccion (X) del eje de
-# pitch (Y). Representa el ancho del bracket de cadera real.
-HIP_LINK_LENGTH = 0.03   # [m]
-HIP_LINK_RADIUS = 0.015  # [m] (link cilindrico)
-HIP_LINK_MASS = 0.05     # [kg]
+# pitch (Y). Representa el bracket de cadera real (bounding box 38.1 x
+# 43.35 x 38.1mm medido en SketchUp -- se toma el lado mas largo como
+# longitud del stub y se promedia el resto para el radio del cilindro).
+HIP_LINK_LENGTH = 0.04335   # [m] 43.35mm medido
+HIP_LINK_RADIUS = 0.01905   # [m] promedio de 38.1mm / 2
+HIP_LINK_MASS = 0.04        # [kg] PLACEHOLDER, ver nota de masas arriba
 
-# Femur (muslo): del hip_pitch a la rodilla.
-FEMUR_LENGTH = 0.12   # [m]
-FEMUR_RADIUS = 0.012  # [m] (cilindro de colision)
-FEMUR_MASS = 0.15     # [kg]
+# Femur (muslo): del hip_pitch a la rodilla. Bounding box medido 29.27 x
+# 53.25 x 19.83mm -- el lado mas largo (53.25mm) es el alcance real del
+# link (el bounding box de SketchUp no viene alineado a longitud/ancho/alto
+# funcional porque la pieza esta rotada en el ensamble).
+FEMUR_LENGTH = 0.05325   # [m] 53.25mm medido (lado mas largo del bounding box)
+FEMUR_RADIUS = 0.0123    # [m] promedio de 29.27/19.83mm / 2
+FEMUR_MASS = 0.03        # [kg] PLACEHOLDER, ver nota de masas arriba
 
-# Tibia (pantorrilla): de la rodilla al pie.
-TIBIA_LENGTH = 0.12   # [m]
-TIBIA_RADIUS = 0.010  # [m]
-TIBIA_MASS = 0.10     # [kg]
+# Tibia (pantorrilla/pie, pieza unica en este diseno): bounding box medido
+# 77.16 x 38.26 x 23.83mm.
+TIBIA_LENGTH = 0.07716   # [m] 77.16mm medido
+TIBIA_RADIUS = 0.0155    # [m] promedio de 38.26/23.83mm / 2
+TIBIA_MASS = 0.03        # [kg] PLACEHOLDER, ver nota de masas arriba
 
 # Pie: esfera chica fija en la punta de la tibia (mejor contacto/friccion
-# que un borde de cilindro). Si tu robot real tiene un pie plano/almohadilla,
-# cambia FOOT_RADIUS o el tipo de colision en generate_urdf.py.
-FOOT_RADIUS = 0.015  # [m]
-FOOT_MASS = 0.02     # [kg]
+# que un borde de cilindro). El diseno real integra el pie en la misma
+# pieza que la tibia, esto queda como aproximacion de la punta de contacto.
+FOOT_RADIUS = 0.012  # [m]
+FOOT_MASS = 0.01     # [kg] PLACEHOLDER, ver nota de masas arriba
 
 # Cuanto se insetea el punto de montaje de la cadera respecto de la esquina
 # del torso (para que el bracket de cadera no quede exactamente en el borde).
@@ -85,7 +96,10 @@ JOINT_MAX_VELOCITY = 6.0    # [rad/s]
 # ---------------------------------------------------------------------------
 # Altura objetivo del torso sobre el piso, de pie con las patas algo
 # flexionadas (no estiradas del todo: mas estabilidad y rango de movimiento).
-TARGET_STANDING_HEIGHT = 0.18  # [m]
+# Alcance vertical maximo de la pata = FEMUR_LENGTH + TIBIA_LENGTH = ~130mm
+# (con las medidas reales de arriba); target ~75% de eso, extendida pero no
+# al limite.
+TARGET_STANDING_HEIGHT = 0.098  # [m]
 
 # Angulos de pata (grados) que producen aproximadamente TARGET_STANDING_HEIGHT
 # con el robot parado quieto. Se usan como pose inicial en cada reset() del
@@ -138,7 +152,7 @@ ALL_JOINT_NAMES = [
 # TERMINACION / REWARD (entorno RL) -- no son parametros del robot fisico,
 # pero viven aca para tener un solo lugar de configuracion del experimento.
 # ---------------------------------------------------------------------------
-MIN_TORSO_HEIGHT = 0.08      # [m] si el torso baja de esto, cae -> terminate
+MIN_TORSO_HEIGHT = 0.045     # [m] si el torso baja de esto, cae -> terminate
 MAX_ROLL_PITCH_DEG = 45.0    # [deg] si roll o pitch superan esto -> terminate
 MAX_EPISODE_STEPS = 1000
 
