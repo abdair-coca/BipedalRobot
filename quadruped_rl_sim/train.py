@@ -26,6 +26,7 @@ import os
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import CheckpointCallback
+from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
 import config as cfg
@@ -63,6 +64,11 @@ def make_env_fn(seed):
     def _init():
         env = QuadrupedEnv(render_mode=None)
         env.reset(seed=seed)
+        # Monitor es lo que le permite a SB3 loguear rollout/ep_rew_mean y
+        # rollout/ep_len_mean en tensorboard (detecta el fin de episodio via
+        # el dict "episode" que agrega al info al terminar/truncar). Sin esto
+        # solo se ven las secciones time/ y train/, no rollout/.
+        env = Monitor(env)
         return env
     return _init
 
