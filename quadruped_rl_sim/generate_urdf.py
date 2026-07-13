@@ -181,12 +181,22 @@ def build_urdf():
     # materiales (solo visual, no afecta fisica)
     parts.append('  <material name="torso_mat"><color rgba="0.25 0.25 0.28 1"/></material>\n')
     parts.append('  <material name="leg_mat"><color rgba="0.15 0.45 0.75 1"/></material>\n')
-    parts.append('  <material name="foot_mat"><color rgba="0.85 0.15 0.15 1"/></material>\n\n')
+    parts.append('  <material name="foot_mat"><color rgba="0.85 0.15 0.15 1"/></material>\n')
+    parts.append('  <material name="nose_mat"><color rgba="1.0 0.9 0.0 1"/></material>\n\n')
 
     # torso = base link (root). Sin joint padre => PyBullet lo carga como
     # base libre (6 DOF flotantes) si loadURDF se llama con useFixedBase=False.
     parts.append(box_link("torso", cfg.BODY_LENGTH, cfg.BODY_WIDTH, cfg.BODY_HEIGHT,
                            cfg.BODY_MASS, material="torso_mat"))
+    parts.append("\n")
+
+    # marcador visual amarillo en la punta +X del torso (adelante, direccion
+    # que la reward de quad_env.py premia). Solo para identificar orientacion
+    # a simple vista en GUI/capturas, masa despreciable, no afecta la fisica.
+    nose_size = 0.02
+    parts.append(box_link("nose_marker", nose_size, nose_size, nose_size, 0.001, material="nose_mat"))
+    parts.append(fixed_joint("nose_marker_joint", "torso", "nose_marker",
+                              f"{cfg.BODY_LENGTH / 2.0 + nose_size / 2.0:.6f} 0 0"))
     parts.append("\n")
 
     for leg_name in cfg.LEG_NAMES:
@@ -203,8 +213,7 @@ def main():
     urdf_text = build_urdf()
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(urdf_text)
-    n_joints = 12  # 3 por pata x 4 patas (fixed joints de pie no cuentan)
-    print(f"URDF generado: {out_path} ({n_joints} joints revolute + 4 fixed de pie)")
+    print(f"URDF generado: {out_path} (12 joints revolute + 4 fixed de pie + 1 fixed de marcador nariz)")
 
 
 if __name__ == "__main__":
