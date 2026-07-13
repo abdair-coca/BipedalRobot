@@ -25,11 +25,25 @@ import math
 BODY_LENGTH = 0.14595   # [m] eje X, 145.95mm medido
 BODY_WIDTH = 0.11419    # [m] eje Y, 114.19mm medido
 BODY_HEIGHT = 0.040     # [m] eje Z, 40mm medido
-# MASAS: TODO -- no hay peso real todavia (pesar el chasis/patas impresos +
-# servos + bateria en balanza). Valores placeholder chicos, coherentes con
-# un chasis de este tamano en impresion 3D + servos tipo SG90/MG90S, pero
-# NO son una medicion real. Reemplazar apenas se pese el robot.
-BODY_MASS = 0.25       # [kg] PLACEHOLDER
+
+# MASAS: estimadas (2026-07-13), no medidas en balanza -- reemplazar en
+# cuanto peses el robot real. Supuestos usados para toda la estimacion:
+#   - Piezas impresas en PLA: densidad efectiva ~620 kg/m3 (~50% de la
+#     densidad solida del PLA, 1240 kg/m3, para compensar infill+paredes
+#     tipico de brackets chicos impresos en 3D).
+#   - Placa base del torso: se estima como plancha de ~4mm de espesor en
+#     PLA casi solido (1240 kg/m3), no como el bounding box completo de
+#     40mm (ese alto incluye la caja de bateria/parantes, no es material
+#     macizo).
+#   - Servo: MG90S, 13.4g cada uno (dato de hoja tecnica), 12 en total.
+#   - Electronica torso: ESP32 (~10g) + driver PCA9685 (~10g) + cableado
+#     y conectores (~15g) = ~35g.
+#   - Bateria: generica chica sin definir todavia, placeholder ~60g
+#     (equivalente a un LiPo 2S chico o 2x18650). Ajustar cuando elijas
+#     la bateria real.
+# Placa torso ~ 0.14595*0.11419*0.004 m3 * 1240 kg/m3 = ~83g
+# + electronica ~35g + bateria ~60g => ~178g
+BODY_MASS = 0.178       # [kg] ESTIMADO (plancha PLA + ESP32 + PCA9685 + bateria generica)
 
 # ---------------------------------------------------------------------------
 # GEOMETRIA DE PATA (misma para las 4 patas; cambia solo el signo del
@@ -39,29 +53,35 @@ BODY_MASS = 0.25       # [kg] PLACEHOLDER
 # pitch (Y). Representa el bracket de cadera real (bounding box 38.1 x
 # 43.35 x 38.1mm medido en SketchUp -- se toma el lado mas largo como
 # longitud del stub y se promedia el resto para el radio del cilindro).
+# Lleva 2 servos MG90S montados (abduccion + hip-pitch, tipicamente
+# apilados en el hombro/cadera): bracket PLA (pi*r^2*L * 620 kg/m3 = ~31g)
+# + 2x13.4g servo = ~57g.
 HIP_LINK_LENGTH = 0.04335   # [m] 43.35mm medido
 HIP_LINK_RADIUS = 0.01905   # [m] promedio de 38.1mm / 2
-HIP_LINK_MASS = 0.04        # [kg] PLACEHOLDER, ver nota de masas arriba
+HIP_LINK_MASS = 0.057       # [kg] ESTIMADO (bracket PLA + 2x servo MG90S)
 
 # Femur (muslo): del hip_pitch a la rodilla. Bounding box medido 29.27 x
 # 53.25 x 19.83mm -- el lado mas largo (53.25mm) es el alcance real del
 # link (el bounding box de SketchUp no viene alineado a longitud/ancho/alto
 # funcional porque la pieza esta rotada en el ensamble).
+# Lleva 1 servo MG90S montado en la punta (actua la rodilla): bracket PLA
+# (~16g) + 1x13.4g servo = ~29g.
 FEMUR_LENGTH = 0.05325   # [m] 53.25mm medido (lado mas largo del bounding box)
 FEMUR_RADIUS = 0.0123    # [m] promedio de 29.27/19.83mm / 2
-FEMUR_MASS = 0.03        # [kg] PLACEHOLDER, ver nota de masas arriba
+FEMUR_MASS = 0.029       # [kg] ESTIMADO (bracket PLA + 1x servo MG90S)
 
 # Tibia (pantorrilla/pie, pieza unica en este diseno): bounding box medido
 # 77.16 x 38.26 x 23.83mm.
+# Solo PLA, sin servo propio (la rodilla la mueve el servo del femur).
 TIBIA_LENGTH = 0.07716   # [m] 77.16mm medido
 TIBIA_RADIUS = 0.0155    # [m] promedio de 38.26/23.83mm / 2
-TIBIA_MASS = 0.03        # [kg] PLACEHOLDER, ver nota de masas arriba
+TIBIA_MASS = 0.036       # [kg] ESTIMADO (solo bracket PLA, sin servo)
 
 # Pie: esfera chica fija en la punta de la tibia (mejor contacto/friccion
 # que un borde de cilindro). El diseno real integra el pie en la misma
 # pieza que la tibia, esto queda como aproximacion de la punta de contacto.
 FOOT_RADIUS = 0.012  # [m]
-FOOT_MASS = 0.01     # [kg] PLACEHOLDER, ver nota de masas arriba
+FOOT_MASS = 0.005    # [kg] ESTIMADO (punta PLA/goma chica)
 
 # Cuanto se insetea el punto de montaje de la cadera respecto de la esquina
 # del torso (para que el bracket de cadera no quede exactamente en el borde).
