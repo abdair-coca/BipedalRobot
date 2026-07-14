@@ -49,6 +49,7 @@ Alternativa sin compilar: instalar Miniconda y `conda install -c conda-forge pyb
 | `quad_env.py` | `QuadrupedEnv(gymnasium.Env)`: observacion (31,), accion (12,) normalizada [-1,1] mapeada a angulos reales, reward, terminacion. Control por posicion (`POSITION_CONTROL`), no por torque. |
 | `train.py` | Entrena PPO con `stable_baselines3`, entornos en paralelo (`SubprocVecEnv`), checkpoints periodicos, logging a `logs/` (tensorboard). |
 | `enjoy.py` | Carga un `.zip` de SB3 y corre la politica en GUI, en tiempo real. |
+| `view_model.py` | Abre el URDF actual en GUI, parado en la pose de reposo, sin entrenar ni cargar modelo -- para chequear proporciones/postura cuando quieras. |
 | `requirements.txt` | Versiones pineadas, probadas juntas. |
 | `colab_train.ipynb` | Entrena en Google Colab (gratis) en vez de tu laptop. Auto-resume, checkpoints persistidos en Drive, video del gait sin GUI. Ver seccion "Entrenar en la nube" abajo. |
 
@@ -57,6 +58,12 @@ Alternativa sin compilar: instalar Miniconda y `conda install -c conda-forge pyb
 Generar el URDF (opcional, `quad_env.py` lo hace solo si falta):
 ```bash
 python generate_urdf.py
+```
+
+Ver el diseno (proporciones, postura, colisiones) sin entrenar ni cargar ningun
+modelo, cuando quieras:
+```bash
+python view_model.py
 ```
 
 Entrenar:
