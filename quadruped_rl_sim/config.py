@@ -90,6 +90,16 @@ FOOT_MASS = 0.005    # [kg] ESTIMADO (punta PLA/goma chica)
 # del cuerpo (postura tipo "perro"), no es lo que queremos aca.
 SPIDER_SPLAY_DEG = 45.0
 
+# Cajitas visuales/colision en cada uno de los 3 joints por pata,
+# representando el cuerpo del servo MG90S (23 x 12 x 28.5mm segun hoja de
+# datos tipica) para que se vea espacio real para el servo en cada
+# articulacion. Solo estetico/colision -- la MASA del servo ya esta sumada
+# en HIP_LINK_MASS/FEMUR_MASS de arriba, estas cajas llevan masa
+# practicamente nula para no contarla dos veces.
+SERVO_BODY_LENGTH = 0.023  # [m]
+SERVO_BODY_WIDTH = 0.012   # [m]
+SERVO_BODY_HEIGHT = 0.0285 # [m]
+
 # Cuanto se insetea el punto de montaje de la cadera respecto de la esquina
 # del torso (para que el bracket de cadera no quede exactamente en el borde).
 HIP_MOUNT_INSET_X = 0.02  # [m]

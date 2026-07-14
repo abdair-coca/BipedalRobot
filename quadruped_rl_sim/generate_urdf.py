@@ -125,6 +125,14 @@ def fixed_joint(name, parent, child, xyz):
 """
 
 
+def servo_box_link(name):
+    """Cajita chica (visual + colision) representando el cuerpo de un
+    MG90S, con masa practicamente nula (la masa real ya esta contada en
+    el link padre -- ver SERVO_BODY_* en config.py)."""
+    return box_link(name, cfg.SERVO_BODY_LENGTH, cfg.SERVO_BODY_WIDTH,
+                     cfg.SERVO_BODY_HEIGHT, 0.001, material="leg_mat")
+
+
 def build_leg(leg_name):
     sign_x, sign_y = cfg.LEG_MOUNT_SIGN[leg_name]
 
@@ -157,6 +165,16 @@ def build_leg(leg_name):
                           cfg.TIBIA_MASS, xyz=f"0 0 {-cfg.TIBIA_LENGTH / 2.0:.6f}")
     xml += sphere_link(foot_link_name, cfg.FOOT_RADIUS, cfg.FOOT_MASS)
 
+    # cajitas de servo: una en cada joint (abduccion, pitch, rodilla),
+    # pegadas al link hijo justo en el origen del joint. Solo dan espacio
+    # visual/colision, no aportan masa nueva.
+    abd_servo_name = f"{leg_name}_abduction_servo"
+    pitch_servo_name = f"{leg_name}_pitch_servo"
+    knee_servo_name = f"{leg_name}_knee_servo"
+    xml += servo_box_link(abd_servo_name)
+    xml += servo_box_link(pitch_servo_name)
+    xml += servo_box_link(knee_servo_name)
+
     abd_lo, abd_hi = cfg.JOINT_LIMITS_RAD["hip_abduction"]
     pitch_lo, pitch_hi = cfg.JOINT_LIMITS_RAD["hip_pitch"]
     knee_lo, knee_hi = cfg.JOINT_LIMITS_RAD["knee"]
@@ -188,6 +206,10 @@ def build_leg(leg_name):
                            f"0 0 {-cfg.FEMUR_LENGTH:.6f}", knee_lo, knee_hi)
     xml += fixed_joint(foot_joint_name, tibia_link_name, foot_link_name,
                         f"0 0 {-cfg.TIBIA_LENGTH:.6f}")
+
+    xml += fixed_joint(f"{abd_servo_name}_joint", hip_link_name, abd_servo_name, "0 0 0")
+    xml += fixed_joint(f"{pitch_servo_name}_joint", femur_link_name, pitch_servo_name, "0 0 0")
+    xml += fixed_joint(f"{knee_servo_name}_joint", tibia_link_name, knee_servo_name, "0 0 0")
 
     return xml
 
@@ -232,7 +254,8 @@ def main():
     urdf_text = build_urdf()
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(urdf_text)
-    print(f"URDF generado: {out_path} (12 joints revolute + 4 fixed de pie + 1 fixed de marcador nariz)")
+    print(f"URDF generado: {out_path} (12 joints revolute + 4 fixed de pie + "
+          f"12 fixed de cajitas de servo + 1 fixed de marcador nariz)")
 
 
 if __name__ == "__main__":
