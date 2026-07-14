@@ -83,6 +83,13 @@ TIBIA_MASS = 0.036       # [kg] ESTIMADO (solo bracket PLA, sin servo)
 FOOT_RADIUS = 0.012  # [m]
 FOOT_MASS = 0.005    # [kg] ESTIMADO (punta PLA/goma chica)
 
+# Postura "arania": angulo (grados) que rota el montaje de cada pata hacia
+# la esquina diagonal del torso en vez de derecho hacia el costado (ver
+# imagen de referencia del diseno real). 45 = patas formando una X vista
+# desde arriba, como en la CAD real. 0 = patas perpendiculares al costado
+# del cuerpo (postura tipo "perro"), no es lo que queremos aca.
+SPIDER_SPLAY_DEG = 45.0
+
 # Cuanto se insetea el punto de montaje de la cadera respecto de la esquina
 # del torso (para que el bracket de cadera no quede exactamente en el borde).
 HIP_MOUNT_INSET_X = 0.02  # [m]
@@ -116,17 +123,19 @@ JOINT_MAX_VELOCITY = 6.0    # [rad/s]
 # ---------------------------------------------------------------------------
 # Altura objetivo del torso sobre el piso, de pie con las patas algo
 # flexionadas (no estiradas del todo: mas estabilidad y rango de movimiento).
-# Alcance vertical maximo de la pata = FEMUR_LENGTH + TIBIA_LENGTH = ~130mm
-# (con las medidas reales de arriba); target ~75% de eso, extendida pero no
-# al limite.
-TARGET_STANDING_HEIGHT = 0.098  # [m]
+# Calculado con forward kinematics (no a ojo, ver pose de abajo): con el
+# montaje diagonal de SPIDER_SPLAY_DEG, la abduccion (no el pitch) es la
+# que controla que tan abierta/en diagonal queda la pata -- se barrio
+# abduccion/pitch/rodilla numericamente hasta encontrar el angulo de pie
+# a ~45 grados del eje X (diagonal real, no tipo perro).
+TARGET_STANDING_HEIGHT = 0.107  # [m]
 
 # Angulos de pata (grados) que producen aproximadamente TARGET_STANDING_HEIGHT
 # con el robot parado quieto. Se usan como pose inicial en cada reset() del
 # entorno, asi el episodio no arranca en una configuracion rara/inestable.
-STANDING_HIP_ABDUCTION_DEG = 0.0
-STANDING_HIP_PITCH_DEG = -20.0
-STANDING_KNEE_DEG = 60.0
+STANDING_HIP_ABDUCTION_DEG = 20.0   # abre la pata a la diagonal (bearing ~45 deg)
+STANDING_HIP_PITCH_DEG = -10.0
+STANDING_KNEE_DEG = 15.0            # pata casi estirada
 
 # ---------------------------------------------------------------------------
 # DERIVADOS (no editar a mano, se calculan solos)

@@ -104,11 +104,11 @@ def sphere_link(name, radius, mass, material="foot_mat"):
 """
 
 
-def revolute_joint(name, parent, child, axis, xyz, lower_rad, upper_rad):
+def revolute_joint(name, parent, child, axis, xyz, lower_rad, upper_rad, rpy="0 0 0"):
     return f"""  <joint name="{name}" type="revolute">
     <parent link="{parent}"/>
     <child link="{child}"/>
-    <origin xyz="{xyz}" rpy="0 0 0"/>
+    <origin xyz="{xyz}" rpy="{rpy}"/>
     <axis xyz="{axis}"/>
     <limit lower="{lower_rad:.6f}" upper="{upper_rad:.6f}" effort="{cfg.JOINT_MAX_TORQUE}" velocity="{cfg.JOINT_MAX_VELOCITY}"/>
     <dynamics damping="0.05" friction="0.02"/>
@@ -161,8 +161,27 @@ def build_leg(leg_name):
     pitch_lo, pitch_hi = cfg.JOINT_LIMITS_RAD["hip_pitch"]
     knee_lo, knee_hi = cfg.JOINT_LIMITS_RAD["knee"]
 
-    xml += revolute_joint(abd_joint_name, "torso", hip_link_name, "1 0 0",
-                           f"{mount_x:.6f} {mount_y:.6f} {mount_z:.6f}", abd_lo, abd_hi)
+    # rotacion de montaje (yaw, eje Z) que apunta la pata entera hacia la
+    # esquina diagonal del torso en vez de derecho hacia el costado -- esto
+    # es lo que da la postura "arania" (patas en X vistas desde arriba) en
+    # vez de una postura "perro" (patas rectas bajo el cuerpo). El resto de
+    # la cadena (abduccion, pitch, rodilla) queda igual, solo que ahora
+    # actua dentro de este plano rotado.
+    mount_yaw = -sign_x * sign_y * math.radians(cfg.SPIDER_SPLAY_DEG)
+    mount_rpy = f"0 0 {mount_yaw:.6f}"
+
+    # el eje de abduccion se invierte segun el lado (izq/der): por el
+    # montaje diagonal (mount_yaw, con signo opuesto entre izq/der), rotar
+    # ambos lados sobre el MISMO eje local con el MISMO angulo no da un
+    # movimiento espejado (un lado se abre, el otro se deforma). Invertir
+    # el eje local en el lado derecho hace que un mismo angulo comandado
+    # produzca el mismo movimiento fisico (abrir/cerrar) en las 4 patas --
+    # verificado numericamente (misma distancia/altura de pie en las 4).
+    abd_axis = f"{sign_y} 0 0"
+
+    xml += revolute_joint(abd_joint_name, "torso", hip_link_name, abd_axis,
+                           f"{mount_x:.6f} {mount_y:.6f} {mount_z:.6f}", abd_lo, abd_hi,
+                           rpy=mount_rpy)
     xml += revolute_joint(pitch_joint_name, hip_link_name, femur_link_name, "0 1 0",
                            f"0 {sign_y * cfg.HIP_LINK_LENGTH:.6f} 0", pitch_lo, pitch_hi)
     xml += revolute_joint(knee_joint_name, femur_link_name, tibia_link_name, "0 1 0",
